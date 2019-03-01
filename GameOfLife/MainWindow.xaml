@@ -5,8 +5,15 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:GameOfLife"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        Title="Game of Life" Height="350" Width="525" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" Loaded="Window_Loaded">
     <Grid>
-        
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="0.25*"/>
+        </Grid.ColumnDefinitions>
+        <Grid x:Name="GridMap" Grid.Column="0" Grid.Row="0" PreviewMouseLeftButtonDown="GridMap_PreviewMouseLeftButtonDown" >
+
+        </Grid>
+        <Button Content="Start/Stop" Grid.Column="1" HorizontalAlignment="Left" Margin="10,30,0,0" VerticalAlignment="Top" Width="84" Click="Button_Click"/>
     </Grid>
 </Window>
