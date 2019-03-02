@@ -17,18 +17,25 @@ using System.Windows.Shapes;
 
 namespace GameOfLife
 {
-    
+
     public partial class MainWindow : Window
     {
 
         bool start = false;
 
+        int num = Globals.igNum;
+
         List<Ellipse> elements;
+
+        GameLogic game;
+
+        TimeSpan startTimeSpan;
+        TimeSpan periodTimeSpan;
 
         public MainWindow()
         {
             InitializeComponent();
-            initGrid(Globals.igNum);
+            initGrid(num);
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -38,13 +45,13 @@ namespace GameOfLife
 
         private void initGrid(int num)
         {
-            for(int i = 0; i < num; i++)
+            for (int i = 0; i < num; i++)
             {
                 GridMap.RowDefinitions.Add(new RowDefinition());
                 GridMap.ColumnDefinitions.Add(new ColumnDefinition());
             }
 
-            
+
         }
         private List<Ellipse> initCells()
         {
@@ -79,10 +86,80 @@ namespace GameOfLife
             return aEllipse;
         }
 
+        private bool[,] gridToArr()
+        {
+            bool[,] Cells = new bool[num, num];
+            int iRow = -1;
+            foreach (RowDefinition row in GridMap.RowDefinitions)
+            {
+                iRow++;
+                int iCol = -1;
+                foreach (ColumnDefinition col in GridMap.ColumnDefinitions)
+                {
+                    iCol++;
+                    Ellipse ellipse = GridMap.Children.Cast<Ellipse>()
+                        .First(ee => Grid.GetRow(ee) == iRow && Grid.GetColumn(ee) == iCol);
+                    if (ellipse.Fill == System.Windows.Media.Brushes.White) Cells[iRow, iCol] = false;
+                    else Cells[iRow, iCol] = true;
+                }
+            }
+            return Cells;
+        }
+
+        private void updateCells(bool[,] cells)
+        {
+            int iRow = -1;
+            foreach (RowDefinition row in GridMap.RowDefinitions)
+            {
+                iRow++;
+                int iCol = -1;
+                foreach (ColumnDefinition col in GridMap.ColumnDefinitions)
+                {
+                    iCol++;
+
+                    Ellipse ellipse = GridMap.Children.Cast<Ellipse>()
+                        .First(ee => Grid.GetRow(ee) == iRow && Grid.GetColumn(ee) == iCol);
+                    if (cells[iRow, iCol] == false) ellipse.Fill = System.Windows.Media.Brushes.White;
+                    else ellipse.Fill = System.Windows.Media.Brushes.DarkBlue;
+                }
+            }
+        }
+
+        async Task RunPeriodicSave()
+        {
+            while (start)
+            {
+                await Task.Delay(100);
+                game.update();
+                updateCells(game.Cells);
+            }
+        }
+
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            if (!start) start = true;
-            else start = false;
+            Button button = (Button)sender;
+            if (!start)
+            {
+                button.Content = "Stop";
+                start = true;
+                game = new GameLogic(gridToArr());
+                RunPeriodicSave();
+
+                /*
+                startTimeSpan = TimeSpan.Zero;
+                periodTimeSpan = TimeSpan.FromSeconds(2);
+
+                var timer = new System.Threading.Timer((ee) =>
+                {
+                    game.update();
+                    updateCells(game.Cells);
+                }, null, startTimeSpan, periodTimeSpan);*/
+            }
+            else
+            {
+                button.Content = "Start";
+                start = false;
+            }
         }
 
         private void GridMap_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)

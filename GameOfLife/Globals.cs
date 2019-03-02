@@ -8,6 +8,6 @@ namespace GameOfLife
 {
     class Globals
     {
-        public static int igNum = 10;
+        public static int igNum = 20;
     }
 }
