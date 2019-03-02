@@ -100,7 +100,7 @@ namespace GameOfLife
                     Ellipse ellipse = GridMap.Children.Cast<Ellipse>()
                         .First(ee => Grid.GetRow(ee) == iRow && Grid.GetColumn(ee) == iCol);
                     if (ellipse.Fill == System.Windows.Media.Brushes.White) Cells[iRow, iCol] = false;
-                    else Cells[iRow, iCol] = true;
+                    else if(ellipse.Fill == System.Windows.Media.Brushes.DarkBlue) Cells[iRow, iCol] = true;
                 }
             }
             return Cells;
@@ -120,7 +120,7 @@ namespace GameOfLife
                     Ellipse ellipse = GridMap.Children.Cast<Ellipse>()
                         .First(ee => Grid.GetRow(ee) == iRow && Grid.GetColumn(ee) == iCol);
                     if (cells[iRow, iCol] == false) ellipse.Fill = System.Windows.Media.Brushes.White;
-                    else ellipse.Fill = System.Windows.Media.Brushes.DarkBlue;
+                    else if(cells[iRow, iCol] == true) ellipse.Fill = System.Windows.Media.Brushes.DarkBlue;
                 }
             }
         }
@@ -131,11 +131,12 @@ namespace GameOfLife
             {
                 await Task.Delay(100);
                 game.update();
+                await Task.Delay(100);
                 updateCells(game.Cells);
             }
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private async void Button_Click(object sender, RoutedEventArgs e)
         {
             Button button = (Button)sender;
             if (!start)
@@ -143,7 +144,14 @@ namespace GameOfLife
                 button.Content = "Stop";
                 start = true;
                 game = new GameLogic(gridToArr());
-                RunPeriodicSave();
+                try
+                {
+                    await RunPeriodicSave();
+                }
+                finally
+                {
+
+                }
 
                 /*
                 startTimeSpan = TimeSpan.Zero;

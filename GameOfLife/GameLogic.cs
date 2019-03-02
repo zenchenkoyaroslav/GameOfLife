@@ -8,7 +8,7 @@ namespace GameOfLife
 {
     class GameLogic
     {
-        private static int num = Globals.igNum;
+        private static readonly int num = Globals.igNum;
 
         public bool[,] Cells { get; set; } = new bool[num, num];
 
